@@ -31,6 +31,8 @@ function NetworkClient(config, deviceData) {
           if (device != null)
             addDevice(deviceList, device)
         }
+      
+        cb(deviceList)
       })
 
   }
