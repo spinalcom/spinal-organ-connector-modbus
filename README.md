@@ -1,8 +1,8 @@
 <!-- DO NOT EDIT README.md (It will be overridden by README.hbs) -->
 
-# spinal-organ-network_sample
+# spinal-organ-connector-modbus
 
-Sample organ to demonstrate how to use the spinal-model-bmsnetwork.
+Sample organ to demonstrate how to use the spinal-organ-connector-modbus.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
