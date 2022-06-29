@@ -1,7 +1,7 @@
 {
   spinalConnector: {
     user: 168, // user id - process.env.SPINAL_USER_ID
-    password: "JHGgcz45JKilmzknzelf65ddDadggftIO98P", // user password - process.env.SPINAL_USER_ID 
+    password: "put your password here", // user password - process.env.SPINAL_USER_ID 
     host: "127.0.0.1", // can be an ip address - process.env.SPINALHUB_IP
     port: 7777 // port - process.env.SPINALHUB_PORT
   },
