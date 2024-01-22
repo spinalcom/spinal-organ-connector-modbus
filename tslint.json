@@ -1,13 +1,16 @@
 {
-  "defaultSeverity": "error",
   "extends": [
     "tslint-config-airbnb"
   ],
-  "jsRules": {},
   "rules": {
     "no-console": false,
-    "no-boolean-literal-compare": true,
-    "typedef": true
-  },
-  "rulesDirectory": []
+    "max-line-length": [
+      true,
+      {
+        "limit": 120,
+        "ignore-pattern": "// "
+      }
+    ],
+    "no-boolean-literal-compare": false
+  }
 }

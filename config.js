@@ -22,5 +22,16 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-require('dotenv').config();
-require('./build/index');
+module.exports = {
+  spinalhub: {
+    protocol: process.env.SPINALHUB_PROTOCOL || "http",
+    host: process.env.SPINALHUB_IP || "127.0.0.1",
+    port: process.env.SPINALHUB_PORT || 0,
+    userID: process.env.SPINAL_USER_ID || 0,
+    userPassword: process.env.SPINAL_PASSWORD || ""
+  },
+  organ: {
+    name: process.env.SPINAL_ORGAN_NAME || "Organ api otis",
+    configPath: process.env.SPINAL_CONFIG_PATH || "/etc/Organs/otis"
+  }
+};

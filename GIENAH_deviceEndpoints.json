@@ -1,0 +1,255 @@
+[
+    {
+        "name": "MGATE MB3180",
+        "ip": "172.16.114.50",
+        "port": 502,
+        "registers": [
+            {
+                "type": "PDL",
+                "address": 20,
+                "name": "CPT_GIE_TD_A0.1_Aile_A_CVC",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 23,
+                "name": "CPT_GIE_TD_A0.2_Aile_B_CVC",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 2,
+                "name": "CPT_GIE_TD_A1.1_CVC",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 28,
+                "name": "CPT_GIE_TD_A1.2_CVC",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 31,
+                "name": "CPT_GIE_TD_A1.3_CVC",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 34,
+                "name": "CPT_GIE_TD_A1.4_CVC",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 37,
+                "name": "CPT_GIE_TD_A2.1_CVC",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 40,
+                "name": "CPT_GIE_TD_A2.2_CVC",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 43,
+                "name": "CPT_GIE_TD_A2.3_CVC",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 46,
+                "name": "CPT_GIE_TD_A2.4_CVC",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 18,
+                "name": "index_CPT-GIE-TD A0.1 Aile A-Eclairage",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 21,
+                "name": "CPT_GIE_TD_A0.2_Aile_B_Eclairage",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 24,
+                "name": "CPT_GIE_TD_A1.1_Eclairage",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 26,
+                "name": "CPT_GIE_TD_A1.2_Eclairage",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 29,
+                "name": "CPT_GIE_TD_A1.3_Eclairage",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 32,
+                "name": "CPT_GIE_TD_A1.4_Eclairage",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 35,
+                "name": "CPT_GIE_TD_A2.1_Eclairage",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 38,
+                "name": "CPT_GIE_TD_A2.2_Eclairage",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 41,
+                "name": "CPT_GIE_TD_A2.3_Eclairage",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 44,
+                "name": "CPT_GIE_TD_A2.4_Eclairage",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 3,
+                "name": "CPT_GIE_General_TD_A0_1_Aile_A",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 7,
+                "name": "CPT_GIE_General_TD_A0_2_Aile_B",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 8,
+                "name": "CPT_GIE_General_TD_A1_1",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 10,
+                "name": "CPT_GIE_General_TD_A1_2",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 11,
+                "name": "CPT_GIE_General_TD_A1_3",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 12,
+                "name": "CPT_GIE_General_TD_A1_4",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 9,
+                "name": "CPT_GIE_General_TD_A2_1",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 13,
+                "name": "CPT_GIE_General_TD_A2_2",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 4,
+                "name": "CPT_GIE_General_TD_A2_3",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 2,
+                "name": "CPT_GIE_General_TD_A2_4",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 19,
+                "name": "CPT_GIE_TD_A0.1_Aile_A_PC_FM",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 22,
+                "name": "CPT_GIE_TD_A0.2_Aile_B_PC_FM",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 25,
+                "name": "CPT_GIE_TD_A1.1_PC_FM",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 27,
+                "name": "CPT_GIE_TD_A1.2_PC_FM",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 30,
+                "name": "CPT_GIE_TD_A1.3_PC_FM",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 33,
+                "name": "CPT_GIE_TD_A1.4_PC_FM",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 36,
+                "name": "CPT_GIE_TD_A2.1_PC_FM",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 39,
+                "name": "CPT_GIE_TD_A2.2_PC_FM",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 42,
+                "name": "CPT_GIE_TD_A2.3_PC_FM",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 45,
+                "name": "CPT_GIE_TD_A2.4_PC_FM",
+                "size": 32
+            },
+            {
+                "type": "PDL",
+                "address": 47,
+                "name": "CPT_GIE_General_GIENAH_PV",
+                "size": 32
+            }
+        ]
+    }
+]

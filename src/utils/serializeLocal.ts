@@ -22,5 +22,10 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-require('dotenv').config();
-require('./build/index');
+export function serializeLocal(name: string): string {
+  return name?.replace('/', '-')
+    .replace('\r', '')
+    .replace('\n', '')
+    .slice(0, 30);
+}
+

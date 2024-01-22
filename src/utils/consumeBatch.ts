@@ -22,5 +22,19 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-require('dotenv').config();
-require('./build/index');
+export async function consumeBatch<T>(
+  promises: (() => Promise<T>)[],
+  batchSize = 10
+): Promise<T[]> {
+  let index = 0;
+  const result = [];
+  while (index < promises.length) {
+    let endIndex = index + batchSize;
+    if (promises.length <= endIndex) endIndex = promises.length;
+    const slice = promises.slice(index, endIndex);
+    const resProm = await Promise.all(slice.map((e) => e()));
+    result.push(...resProm);
+    index = endIndex;
+  }
+  return result;
+}

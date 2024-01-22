@@ -21,6 +21,11 @@
  * with this file. If not, see
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
+import { SpinalGraph } from 'spinal-env-viewer-graph-service';
 
-require('dotenv').config();
-require('./build/index');
+export default interface IStatus {
+  graph: SpinalGraph<any>;
+
+  start();
+  stop();
+}

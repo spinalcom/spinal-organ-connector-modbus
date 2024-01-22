@@ -22,5 +22,33 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-require('dotenv').config();
-require('./build/index');
+import { ConcurrencyManager } from 'axios-concurrency';
+import axios, { AxiosInstance } from 'axios';
+const MAX_CONCURRENT_REQUESTS = 2;
+
+let axiosInstance: AxiosInstance;
+let manager;
+function newInstance(baseURL: string) {
+  if (axiosInstance) {
+    detachInstance();
+  }
+  axiosInstance = axios.create({
+    baseURL,
+    method: 'get',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  manager = ConcurrencyManager(axiosInstance, MAX_CONCURRENT_REQUESTS);
+}
+
+function detachInstance() {
+  if (axiosInstance) {
+    manager.detach();
+    axiosInstance = null;
+  }
+}
+
+newInstance('https://developers-emea.otis.com');
+export default axiosInstance;
+export { axiosInstance };
+export { newInstance };
+export { detachInstance };

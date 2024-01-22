@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 SpinalCom - www.spinalcom.com
+ * Copyright 2021 SpinalCom - www.spinalcom.com
  *
  * This file is part of SpinalCore.
  *
@@ -21,42 +21,18 @@
  * with this file. If not, see
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
+require('axios-debug-log');
 
-import { spinalCore } from 'spinal-core-connectorjs_type';
-import { ForgeFileItem } from 'spinal-lib-forgefile';
+import { SpinalGraph } from 'spinal-env-viewer-graph-service';
+import { OrganProcess } from './processes/OrganProcess';
 
-require('json5/lib/register');
-// get the config
-const config = require('../config.json5');
-
-import { InputData } from './modules/InputData/InputData';
-import { NetworkProcess } from './modules/NetworkProcess';
-
-// connection string to connect to spinalhub
-const connectOpt =
-    `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${
-        config.spinalConnector.host}:${config.spinalConnector.port}/`;
-
-// initialize the connection
-const conn = spinalCore.connect(connectOpt);
-
-// get the Model from the spinalhub, "onLoadSuccess" and "onLoadError" are 2
-// callback function.
-spinalCore.load(conn, config.file.path, onLoadSuccess, onLoadError);
-
-// called network error or file not found
-function onLoadError() {
-  console.log(`File does not exist in location ${config.file.path}`);
+/**
+ * Create organ process , initialize it and start it
+ */
+async function main() {
+  const organ = new OrganProcess();
+  await organ.init();
+  organ.run();
 }
 
-// called if connected to the server and if the spinalhub sent us the Model
-function onLoadSuccess(forgeFile: ForgeFileItem) {
-  console.log('Connected to the server and got a the Entry Model');
-  const inputData = new InputData();
-  const networkProcess = new NetworkProcess(inputData);
-
-  // reset data for test purpose
-  // if (typeof forgeFile.graph !== 'undefined') forgeFile.rem_attr('graph');
-
-  networkProcess.init(forgeFile, config.organ);
-}
+main();

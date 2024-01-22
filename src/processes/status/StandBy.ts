@@ -22,5 +22,18 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-require('dotenv').config();
-require('./build/index');
+import { SpinalGraph } from 'spinal-env-viewer-graph-service';
+import IStatus from './IStatus';
+
+export default class StandBy implements IStatus {
+  graph: SpinalGraph<any>;
+
+  async start() {
+    console.log('start StandBy');
+    return 0;
+  }
+
+  stop() {
+    console.log('stop StandBy');
+  }
+}
