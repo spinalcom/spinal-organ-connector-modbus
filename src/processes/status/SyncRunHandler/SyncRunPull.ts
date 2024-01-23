@@ -60,9 +60,10 @@ interface ModbusDevice {
   ip: string;
   port: number;
   registers: {
-      type: string;
-      address: number;
       name: string;
+      type: string;
+      bus_address:number;
+      register_address: number;
       size: number;
   }[];
 }
@@ -99,6 +100,14 @@ export class SyncRunPull {
     this.modbusClient = new ModbusRTU();
   }
 
+  bytesToDecimal(bytes: number[]): number {
+    if (bytes.length !== 2) {
+      throw new Error("Array must contain exactly two elements.");
+    }
+  
+    const [byte1, byte2] = bytes;
+    return (byte1 << 16) | byte2;
+  }
   async getContext(): Promise<SpinalNode<any>> {
     const contexts = await this.graph.getChildren();
     for (const context of contexts) {
@@ -192,12 +201,18 @@ export class SyncRunPull {
           continue;
         }
         SpinalGraphService._addNode(endpointNode);
-        this.modbusClient.readHoldingRegisters(register.address, register.size).then((data) => {
-          console.log(data.data);
-          //this.nwService.setEndpointValue(endpointNode.info.id.get(), data.data[0])
-          //this.timeseriesService.pushFromEndpoint(endpointNode.info.id.get(), data.data[0]);
-        });
-        console.log('Updated endpoint ', register.name)
+          this.modbusClient.setID(register.bus_address);
+          this.modbusClient.readHoldingRegisters(register.register_address, register.size).then((data) => {
+           const result = this.bytesToDecimal(data.data);
+          this.nwService.setEndpointValue(endpointNode.info.id.get(), result)
+          this.timeseriesService.pushFromEndpoint(endpointNode.info.id.get(), result);
+          console.log('Updated endpoint ', register.name)  
+          }).catch((e) => {
+            console.error("Error reading endpoint ", register.name)
+            console.error(e);
+          });
+            
+        
       }
     }
 
