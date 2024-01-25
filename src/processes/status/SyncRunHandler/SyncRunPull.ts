@@ -97,34 +97,6 @@ export class SyncRunPull {
     view.setUint16(2, input[1]);
     return view.getUint32(0);
   }
-
-  
-  async getContext(): Promise<SpinalNode<any>> {
-    const contexts = await this.graph.getChildren();
-    for (const context of contexts) {
-      if (context.info.id.get() === this.config.ticketContextId.get()) {
-        // @ts-ignore
-        SpinalGraphService._addNode(context);
-        return context;
-      }
-    }
-    throw new Error('Context Not found');
-  }
-
-  async getSpinalGeo(): Promise<SpinalContext<any>> {
-    const contexts = await this.graph.getChildren();
-    for (const context of contexts) {
-      if (context.info.id.get() === this.config.spatialContextId?.get()) {
-        // @ts-ignore
-        SpinalGraphService._addNode(context);
-        return context;
-      }
-    }
-    const context = await this.graph.getContext('spatial');
-    if (!context) throw new Error('Context Not found');
-    return context;
-  }
-
   async getNetworkContext(): Promise<SpinalNode<any>> {
     const contexts = await this.graph.getChildren();
     for (const context of contexts) {
@@ -136,7 +108,6 @@ export class SyncRunPull {
     }
     throw new Error('Network Context Not found');
   }
-
   private waitFct(nb: number): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(
@@ -147,28 +118,6 @@ export class SyncRunPull {
       );
     });
   }
-
-  /**
-   * Initialize the context (fill the SpinalGraphService)
-   *
-   * @return {*}  {Promise<void>}
-   * @memberof SyncRunPull
-   */
-  async initContext(): Promise<void> {
-    const context = await this.getContext();
-    const spinalGeo = await this.getSpinalGeo();
-    await spinalGeo.findInContext(spinalGeo, (node) => {
-      // @ts-ignore
-      SpinalGraphService._addNode(node);
-      return false;
-    });
-    await context.findInContext(context, (node): false => {
-      // @ts-ignore
-      SpinalGraphService._addNode(node);
-      return false;
-    });
-  }
-  
   async updateEndpoints(modbusConfig : ModbusDevice[]){
     const networkContext = await this.getNetworkContext();
     for(const device of modbusConfig){
