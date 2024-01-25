@@ -32,14 +32,6 @@ import {
   SpinalNodeRef,
   SPINAL_RELATION_PTR_LST_TYPE,
 } from 'spinal-env-viewer-graph-service';
-import { spinalServiceTicket } from 'spinal-service-ticket';
-import {
-  SPINAL_TICKET_SERVICE_STEP_RELATION_NAME,
-  SPINAL_TICKET_SERVICE_STEP_TYPE,
-  SPINAL_TICKET_SERVICE_TICKET_RELATION_NAME,
-  SPINAL_TICKET_SERVICE_PROCESS_RELATION_NAME,
-  SPINAL_TICKET_SERVICE_TICKET_TYPE,
-} from '../../../constants';
 import type OrganConfigModel from '../../../model/OrganConfigModel';
 import { attributeService } from 'spinal-env-viewer-plugin-documentation-service';
 import { NetworkService } from 'spinal-model-bmsnetwork';
@@ -51,9 +43,7 @@ import {
   InputDataEndpointType,
 } from '../../../model/InputData/InputDataModel/InputDataModel';
 import { SpinalServiceTimeseries } from 'spinal-model-timeseries';
-//const ModbusRTU = require("modbus-serial");
 import ModbusRTU from 'modbus-serial';
-//import jsonData from './GIENAH_deviceEndpoints.json'
 
 interface ModbusDevice {
   name: string;
@@ -67,7 +57,6 @@ interface ModbusDevice {
       size: number;
   }[];
 }
-
 
 
 /**
@@ -100,14 +89,16 @@ export class SyncRunPull {
     this.modbusClient = new ModbusRTU();
   }
 
-  bytesToDecimal(bytes: number[]): number {
-    if (bytes.length !== 2) {
-      throw new Error("Array must contain exactly two elements.");
-    }
-  
-    const [byte1, byte2] = bytes;
-    return (byte1 << 16) | byte2;
+  registerValuesToUint32( input: number [] ): number {
+    if(input.length != 2) throw new Error("Input must be an array of 2 numbers");
+    const buffer = new ArrayBuffer(4);
+    const view = new DataView(buffer);
+    view.setUint16(0, input[0]);
+    view.setUint16(2, input[1]);
+    return view.getUint32(0);
   }
+
+  
   async getContext(): Promise<SpinalNode<any>> {
     const contexts = await this.graph.getChildren();
     for (const context of contexts) {
@@ -203,7 +194,7 @@ export class SyncRunPull {
         SpinalGraphService._addNode(endpointNode);
           this.modbusClient.setID(register.bus_address);
           this.modbusClient.readHoldingRegisters(register.register_address, register.size).then((data) => {
-           const result = this.bytesToDecimal(data.data);
+           const result = this.registerValuesToUint32(data.data);
           this.nwService.setEndpointValue(endpointNode.info.id.get(), result)
           this.timeseriesService.pushFromEndpoint(endpointNode.info.id.get(), result);
           console.log('Updated endpoint ', register.name)  
