@@ -146,13 +146,11 @@ export class SyncRunPull {
            const result = this.registerValuesToUint32(data.data);
           this.nwService.setEndpointValue(endpointNode.info.id.get(), result)
           this.timeseriesService.pushFromEndpoint(endpointNode.info.id.get(), result);
-          console.log('Updated endpoint ', register.name)  
+          console.log('Updated endpoint ', register.name); 
           }).catch((e) => {
             console.error("Error reading endpoint ", register.name)
             console.error(e);
           });
-            
-        
       }
     }
 
@@ -189,6 +187,7 @@ export class SyncRunPull {
 
 
   }
+
   async init(): Promise<void> {
     console.log('Initiating SyncRunPull');
     try {

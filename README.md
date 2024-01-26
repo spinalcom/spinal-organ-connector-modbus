@@ -1,9 +1,9 @@
-# spinal-organ-api-otis
-Simple BOS-Otis api connector to register tickets containing various elevator data
+# spinal-organ-connector-modbus
+Simple BOS-MODBUS connector.
 
 ## Getting Started
 
-These instructions will guide you on how to install and make use of the spinal-organ-api-otis.
+These instructions will guide you on how to install and make use of the spinal-organ-connector-modbus.
 
 ### Prerequisites
 
@@ -17,27 +17,43 @@ SPINALHUB_PROTOCOL=                         # The protocol for connecting to the
 SPINALHUB_PORT=                             # The port for connecting to the spinalhub
 DIGITALTWIN_PATH=                           # The path of the digital twin in the spinalhub
 SPINAL_ORGAN_NAME=                          # The name of the organ
-SPINAL_CONFIG_PATH=                         # The path of the config file in the spinalhub exemple : /etc/Organs/otis
+SPINAL_CONFIG_PATH=                         # The path of the config file in the spinalhub exemple : /etc/Organs/modbus
+FILE_NAME=                                  # "path/to/file" the path of the file to read 
 
-TMP_TICKET_TARGET_ID=                       # The static id of the target node for the tickets
-TICKET_CONTEXT_ID=                          # The static id of the context node for the tickets
-SPATIAL_CONTEXT_ID=                         # The static id of the spatial context node for the tickets
-AVAILABILITY_PROCESS_NAME=                  # The name of the availability process
-MAINTENANCE_PROCESS_NAME=                   # The name of the maintenance process
-REPAIR_PROCESS_NAME=                        # The name of the repair process
-CUSTOMER_CALLBACK_PROCESS_NAME=             # The name of the customer callback process
-
-PULL_INTERVAL=                              # Time (in ms) between each update of tickets
-OTIS_AVAILABILITY_SUBSCRIPTION_KEY=         # The subscription key for the otis availability api
-OTIS_MAINTENANCE_SUBSCRIPTION_KEY=          # The subscription key for the otis maintenance api
-OTIS_REPAIR_SUBSCRIPTION_KEY=               # The subscription key for the otis repair api
-OTIS_CUSTOMER_CALLBACK_SUBSCRIPTION_KEY=    # The subscription key for the otis customer callback api
-CUSTOMER_ID=                                # The customer id for the otis api
-CONTRACT_NUMBER=                            # The contract number for the otis api
-COUNTRY_CODE=                               # The country code for the otis api
+PULL_INTERVAL=                              # Time (in ms) between each update
 
 ```
 
+The module also requires an input file ( json or excel ) 
+
+#### Register Information (excel template)
+| Device Name  | IP Address    | Port | Register Name    | Register Type    | Bus Address | Register Address | Size |
+|--------------|---------------|------|------------------|------------------|-------------|------------------|------|
+| MGATE MB3180 | xxx.xx.xx.xx | 502  | register_name     | holding_register | 20          | 50770            | 2    |
+| MGATE MB3180 | xxx.xx.xx.xx | 502  | register_name     | holding_register | 23          | 50770            | 2    |
+| MGATE MB3180 | xxx.xx.xx.xx | 502  | register_name     | holding_register | 2           | 50770            | 2    |
+| MGATE MB3180 | xxx.xx.xx.xx | 502  | register_name     | holding_register | 28          | 50770            | 2    |
+| MGATE MB3180 | xxx.xx.xx.xx | 502  | register_name     | holding_register | 31          | 50770            | 2    |
+| ...          | ...           | ...  | ...                                  | ...              | ...         | ...              | ...  |
+
+#### Register Information (json template)
+```json
+{
+  "name": "Device Name",
+  "ip": "xxxxxxxxx",
+  "port": 502,
+  "registers": [
+    {
+      "name": "Register Name",
+      "type": "Register Type",
+      "bus_address": Bus Address,
+      "register_address": Register Address,
+      "size": Size
+    },
+    // Additional registers can be added here
+  ]
+}
+```
 
 ### Installation
 
@@ -63,6 +79,6 @@ npm run start
 
 Or using [pm2](https://pm2.keymetrics.io/docs/usage/quick-start/)
 ```bash
-pm2 start index.js --name organ-otis
+pm2 start index.js --name spinal-organ-modbus
 ```
 ```
