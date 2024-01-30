@@ -145,6 +145,41 @@
                 "size": 2
             },
             {
+                "name": "CPT_GIE_General_TD_A2_4",
+                "type": "holding_register",
+                "bus_address": 2,
+                "register_address": 19843,
+                "size": 2
+            },
+            {
+                "name": "CPT_GIE_TD_A0.1_Aile_A_PC_FM",
+                "type": "holding_register",
+                "bus_address": 19,
+                "register_address": 50770,
+                "size": 2
+            },
+            {
+                "name": "CPT_GIE_TD_A0.2_Aile_B_PC_FM",
+                "type": "holding_register",
+                "bus_address": 22,
+                "register_address": 50770,
+                "size": 2
+            },
+            {
+                "name": "CPT_GIE_TD_A1.1_PC_FM",
+                "type": "holding_register",
+                "bus_address": 25,
+                "register_address": 50770,
+                "size": 2
+            }
+        ]
+    },
+    {
+        "name": "Diris D50",
+        "ip": "172.16.114.49",
+        "port": 502,
+        "registers": [
+            {
                 "name": "CPT_GIE_General_TD_A0_1_Aile_A",
                 "type": "holding_register",
                 "bus_address": 3,
@@ -212,83 +247,6 @@
                 "type": "holding_register",
                 "bus_address": 2,
                 "register_address": 19843,
-                "size": 2
-            },
-            {
-                "name": "CPT_GIE_TD_A0.1_Aile_A_PC_FM",
-                "type": "holding_register",
-                "bus_address": 19,
-                "register_address": 50770,
-                "size": 2
-            },
-            {
-                "name": "CPT_GIE_TD_A0.2_Aile_B_PC_FM",
-                "type": "holding_register",
-                "bus_address": 22,
-                "register_address": 50770,
-                "size": 2
-            },
-            {
-                "name": "CPT_GIE_TD_A1.1_PC_FM",
-                "type": "holding_register",
-                "bus_address": 25,
-                "register_address": 50770,
-                "size": 2
-            },
-            {
-                "name": "CPT_GIE_TD_A1.2_PC_FM",
-                "type": "holding_register",
-                "bus_address": 27,
-                "register_address": 50770,
-                "size": 2
-            },
-            {
-                "name": "CPT_GIE_TD_A1.3_PC_FM",
-                "type": "holding_register",
-                "bus_address": 30,
-                "register_address": 50770,
-                "size": 2
-            },
-            {
-                "name": "CPT_GIE_TD_A1.4_PC_FM",
-                "type": "holding_register",
-                "bus_address": 33,
-                "register_address": 50770,
-                "size": 2
-            },
-            {
-                "name": "CPT_GIE_TD_A2.1_PC_FM",
-                "type": "holding_register",
-                "bus_address": 36,
-                "register_address": 50770,
-                "size": 2
-            },
-            {
-                "name": "CPT_GIE_TD_A2.2_PC_FM",
-                "type": "holding_register",
-                "bus_address": 39,
-                "register_address": 50770,
-                "size": 2
-            },
-            {
-                "name": "CPT_GIE_TD_A2.3_PC_FM",
-                "type": "holding_register",
-                "bus_address": 42,
-                "register_address": 50770,
-                "size": 2
-            },
-            {
-                "name": "CPT_GIE_TD_A2.4_PC_FM",
-                "type": "holding_register",
-                "bus_address": 45,
-                "register_address": 50770,
-                "size": 2
-            },
-            {
-                "name": "CPT_GIE_General_GIENAH_PV",
-                "type": "holding_register",
-                "bus_address": 47,
-                "register_address": 50770,
                 "size": 2
             }
         ]
