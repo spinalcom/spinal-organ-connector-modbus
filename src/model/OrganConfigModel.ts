@@ -26,9 +26,8 @@ import { spinalCore, Model } from 'spinal-core-connectorjs_type';
 
 export default class OrganConfigModel extends Model {
   digitalTwinPath: spinal.Str;
-  ticketContextId: spinal.Str;
   spatialContextId: spinal.Str;
-  
+
   pullInterval: spinal.Val;
   lastSync: spinal.Val;
   restart: spinal.Bool;
@@ -36,7 +35,6 @@ export default class OrganConfigModel extends Model {
   constructor() {
     super();
     this.add_attr('digitalTwinPath', '/__users__/admin/Digital twin VF');
-    this.add_attr('ticketContextId', '');
     this.add_attr('spatialContextId', '')
     this.add_attr('restart', false);
     this.add_attr('pullInterval', 5 * 60 * 1000);
@@ -51,7 +49,6 @@ export default class OrganConfigModel extends Model {
   initEnv() {
     if (process?.env.DIGITALTWIN_PATH)
       this.digitalTwinPath.set(process.env.DIGITALTWIN_PATH);
-    if (process?.env.TICKET_CONTEXT_ID) this.ticketContextId.set(process.env.TICKET_CONTEXT_ID);
     if (process?.env.SPATIAL_CONTEXT_ID)
       this.spatialContextId.set(process.env.SPATIAL_CONTEXT_ID);
     if (process?.env.PULL_INTERVAL)
@@ -61,7 +58,6 @@ export default class OrganConfigModel extends Model {
     this.restart.bind(() => {
       if (this.restart.get() === true) {
         console.log('Restart organ');
-
         process.exit(0);
       }
     });

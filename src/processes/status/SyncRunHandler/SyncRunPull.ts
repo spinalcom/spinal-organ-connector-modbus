@@ -306,13 +306,45 @@ export class SyncRunPull {
     console.log("updated all max days");
   }
 
-  async run(): Promise<void> {
+  /*async run(): Promise<void> {
     this.running = true;
     const rawData = fs.readFileSync(process.env.FILE_NAME, 'utf8');
     const jsonData = JSON.parse(rawData);
     const modbusConfig: ModbusDevice [] = jsonData;
     this.startEndpointUpdateTimer(modbusConfig);
 
+  }*/
+
+  async run(): Promise<void> {
+    this.running = true;
+    const timeout = parseInt(
+      process.env.PULL_INTERVAL
+    );
+    await this.waitFct(timeout);
+    const rawData = fs.readFileSync(process.env.FILE_NAME, 'utf8');
+    const jsonData = JSON.parse(rawData);
+    const modbusConfig: ModbusDevice [] = jsonData;
+
+    while (true) {
+      if (!this.running) break;
+      const before = Date.now();
+      try {
+
+        const time = (new Date()).toString().split('GMT')[0]
+        console.log('Updating endpoints at ', time, ' ...');
+        await this.updateEndpoints(modbusConfig);
+        console.log("... Data Updated !")
+      } catch (e) {
+        console.error(e);
+        await this.waitFct(1000 * 60);
+      } finally {
+        const delta = Date.now() - before;
+        const timeout = parseInt(
+          process.env.PULL_INTERVAL
+        ) - delta;
+        await this.waitFct(timeout);
+      }
+    }
   }
 
 
