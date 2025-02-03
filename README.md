@@ -9,6 +9,7 @@ These instructions will guide you on how to install and make use of the spinal-o
 ## Overview
 
 This connector can either run standalone without any studio plugin, or it can be used with the spinal-env-viewer-plugin-organ_modbus plugin.
+
 The only difference between the two is that the plugin will allow you to restart, stop , start and upload the modbus configuration file straight from plugin interface.
 
 ### Prerequisites Stand-alone mode
@@ -65,7 +66,7 @@ Since you are using the studio plugin, you'll also need to upload a configuratio
 
 For the templates of the files, please refer to the template section.
 
-#### Register Information (excel template)
+#### Template for excel file
 
 | Device Name | IP Address | Port | Data Point Name | Type             | Bus Address | Address | Size | Is Unsigned | Is Command |
 | ----------- | ---------- | ---- | --------------- | ---------------- | ----------- | ------- | ---- | ----------- | ---------- |
@@ -76,7 +77,7 @@ For the templates of the files, please refer to the template section.
 | DeviceName3 | xx.xx.xx.x | 502  | register_name5  | coil             | 31          | 50770   | 1    | false       | true       |
 | ...         | ...        | ...  | ...             | ...              | ...         | ...     | ...  | ...         | ...        |
 
-#### Register Information (json template exemple)
+#### Template for json file
 
 ```json
 [
