@@ -31,7 +31,7 @@ module.exports = {
     userPassword: process.env.SPINAL_PASSWORD || ""
   },
   organ: {
-    name: process.env.SPINAL_ORGAN_NAME || "Organ api otis",
-    configPath: process.env.SPINAL_CONFIG_PATH || "/etc/Organs/otis"
+    name: process.env.SPINAL_ORGAN_NAME || "Organ modbus",
+    configPath: process.env.SPINAL_CONFIG_PATH || "/etc/Organs/modbus"
   }
 };
