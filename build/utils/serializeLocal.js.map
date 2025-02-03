@@ -1,0 +1,1 @@
+{"version":3,"file":"serializeLocal.js","sourceRoot":"","sources":["../../src/utils/serializeLocal.ts"],"names":[],"mappings":";AAAA;;;;;;;;;;;;;;;;;;;;;;GAsBG;;;AAEH,SAAgB,cAAc,CAAC,IAAY;IACzC,OAAO,IAAI,EAAE,OAAO,CAAC,GAAG,EAAE,GAAG,CAAC;SAC3B,OAAO,CAAC,IAAI,EAAE,EAAE,CAAC;SACjB,OAAO,CAAC,IAAI,EAAE,EAAE,CAAC;SACjB,KAAK,CAAC,CAAC,EAAE,EAAE,CAAC,CAAC;AAClB,CAAC;AALD,wCAKC"}

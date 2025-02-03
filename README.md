@@ -139,14 +139,27 @@ After starting the connector the first time, it will create :
 
 1- A config file to handle the connector state ( running, stopped, restarting ) in the spinal drive ( SPINAL_CONFIG_PATH )
 
+![Organ File](assets/organFile.png)
+
 2- A network context in the spinalhub ( NETWORK_CONTEXT_NAME ) and a virtual network ( VIRTUAL_NETWORK_NAME ) in the digital twin.
 
 In the studio , click on the network context created by the connector, then click on the "Link and Manage Connector" button.
 
+![Link and Manage Connector](assets/studio1.png)
+
 Use the interface to select which modbus connector you want to use to manage this context ( it will look for config files in /etc/Organs/modbus ) 
+
+![Select Connector](assets/studio2.png)
+
 
 Then, upload a modbus configuration file ( either json or xlsx ) using the interface.
 
+![Upload File](assets/studio3.png)
+
 You're all set !
+
+![Upload File](assets/studio4.png)
+
+You can now start, stop, restart the connector and upload a new configuration file using the interface.
 
 

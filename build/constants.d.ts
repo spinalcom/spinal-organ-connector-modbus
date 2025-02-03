@@ -1,0 +1,18 @@
+export { SPINAL_TICKET_SERVICE_STEP_RELATION_NAME, SPINAL_TICKET_SERVICE_STEP_TYPE, SPINAL_TICKET_SERVICE_TICKET_RELATION_NAME, SPINAL_TICKET_SERVICE_TICKET_TYPE, SPINAL_TICKET_SERVICE_PROCESS_RELATION_NAME, } from 'spinal-service-ticket/dist/Constants';
+export declare const GEO_CONTEXT_TYPE = "geographicContext";
+export declare const GEO_SITE_TYPE = "geographicSite";
+export declare const GEO_BUILDING_TYPE = "geographicBuilding";
+export declare const GEO_FLOOR_TYPE = "geographicFloor";
+export declare const GEO_ZONE_TYPE = "geographicZone";
+export declare const GEO_ROOM_TYPE = "geographicRoom";
+export declare const GEO_EQUIPMENT_TYPE = "BIMObject";
+export declare const GEO_REFERENCE_TYPE = "geographicReference";
+export declare const GEO_EQUIPMENT_RELATION = "hasBimObject";
+export declare const GEO_REFERENCE_ROOM_RELATION: string;
+export declare const GEO_FIND_BUILDING: string[];
+export declare const GEO_FIND_FLOOR: string[];
+export declare const GEO_FIND_ROOM: string[];
+export declare const GEO_FIND_EQUIPMENT: string[];
+export declare const GEO_RELATIONS: string[];
+export declare const GEOGRAPHIC_TYPES: string[];
+export declare const GEO_NODE_TYPES: string[];

@@ -164,10 +164,6 @@ fabric.properties
 ### VSCode ###
 .vscode
 
-build
-
-test.ts
-dump*
-tmp
-
 modbus_config*
+
+
