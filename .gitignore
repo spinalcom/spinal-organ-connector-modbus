@@ -169,3 +169,5 @@ build
 test.ts
 dump*
 tmp
+
+modbus_config*

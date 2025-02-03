@@ -26,8 +26,7 @@ import { spinalCore, Model } from 'spinal-core-connectorjs_type';
 
 export default class OrganConfigModel extends Model {
   digitalTwinPath: spinal.Str;
-  spatialContextId: spinal.Str;
-
+  contextId: spinal.Str;
   pullInterval: spinal.Val;
   lastSync: spinal.Val;
   restart: spinal.Bool;
@@ -35,7 +34,7 @@ export default class OrganConfigModel extends Model {
   constructor() {
     super();
     this.add_attr('digitalTwinPath', '/__users__/admin/Digital twin VF');
-    this.add_attr('spatialContextId', '')
+    this.add_attr('contextId', '')
     this.add_attr('restart', false);
     this.add_attr('pullInterval', 5 * 60 * 1000);
     this.add_attr('lastSync', 0);
@@ -49,8 +48,6 @@ export default class OrganConfigModel extends Model {
   initEnv() {
     if (process?.env.DIGITALTWIN_PATH)
       this.digitalTwinPath.set(process.env.DIGITALTWIN_PATH);
-    if (process?.env.SPATIAL_CONTEXT_ID)
-      this.spatialContextId.set(process.env.SPATIAL_CONTEXT_ID);
     if (process?.env.PULL_INTERVAL)
       this.pullInterval.set(process.env.PULL_INTERVAL);
   }

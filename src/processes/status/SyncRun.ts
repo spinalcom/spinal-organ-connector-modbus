@@ -29,10 +29,6 @@ import SyncRunPull from './SyncRunHandler/SyncRunPull';
 import { NetworkService } from "spinal-model-bmsnetwork";
 
 
-
-
-
-
 export default class SyncRun implements IStatus {
   graph: SpinalGraph<any>;
   config: OrganConfigModel;
@@ -44,7 +40,6 @@ export default class SyncRun implements IStatus {
     this.config = config;
     this.nwService = nwService;
     this.syncRunPull = new SyncRunPull(graph, config, nwService);
-    
   }
 
 
