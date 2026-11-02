@@ -61,6 +61,11 @@ export declare class SyncRunPull {
     initModbusConfiguration(): Promise<void>;
     private downloadFile;
     private waitFct;
+    /**
+     * Keeps 366 days of timeseries on a new endpoint. A failure here must not
+     * stop the organ: the endpoint still works with the default retention.
+     */
+    private setTimeSeriesRetention;
     createEndpoint(deviceId: string, endpointName: string, initialValue: number | string | boolean): Promise<SpinalNode<any>>;
     updateData(): Promise<void>;
     private readAllDevices;

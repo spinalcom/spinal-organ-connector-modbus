@@ -248,6 +248,20 @@ class SyncRunPull {
             }, nb >= 0 ? nb : 0);
         });
     }
+    /**
+     * Keeps 366 days of timeseries on a new endpoint. A failure here must not
+     * stop the organ: the endpoint still works with the default retention.
+     */
+    async setTimeSeriesRetention(node) {
+        try {
+            const category = (await spinal_env_viewer_plugin_documentation_service_1.attributeService.getCategoryByName(node, 'default')) ||
+                (await spinal_env_viewer_plugin_documentation_service_1.attributeService.addCategoryAttribute(node, 'default'));
+            await spinal_env_viewer_plugin_documentation_service_1.attributeService.updateAttribute(node, category, 'timeSeries maxDay', { value: '366' }, true);
+        }
+        catch (error) {
+            console.error(`Failed to set timeseries retention on ${node.info.name.get()}:`, error?.message);
+        }
+    }
     async createEndpoint(deviceId, endpointName, initialValue) {
         const context = this.networkContext;
         const endpointNodeModel = new InputDataModel_1.InputDataEndpoint(endpointName, initialValue, '', InputDataModel_1.InputDataEndpointDataType.Real, InputDataModel_1.InputDataEndpointType.Other);
@@ -501,8 +515,7 @@ class SyncRunPull {
                     console.log('Endpoint does not exist, creating new endpoint... ', dataPoint.name);
                     endpointNode = await this.createEndpoint(deviceNode.getId().get(), dataPoint.name, 0);
                     spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(endpointNode);
-                    const realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(endpointNode.getId().get());
-                    await spinal_env_viewer_plugin_documentation_service_1.attributeService.updateAttribute(realNode, 'default', 'timeSeries maxDay', { value: '366' });
+                    await this.setTimeSeriesRetention(spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(endpointNode.getId().get()));
                 }
                 spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(endpointNode);
                 let value;
@@ -668,8 +681,7 @@ class SyncRunPull {
                     console.log('Endpoint do not exist, creating new endpoint... ', dataPoint.name);
                     endpointNode = await this.createEndpoint(deviceNode.getId().get(), dataPoint.name, 0);
                     spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(endpointNode);
-                    const realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(endpointNode.getId().get());
-                    await spinal_env_viewer_plugin_documentation_service_1.attributeService.updateAttribute(realNode, 'default', 'timeSeries maxDay', { value: '366' });
+                    await this.setTimeSeriesRetention(spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(endpointNode.getId().get()));
                 }
                 spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(endpointNode);
             }
