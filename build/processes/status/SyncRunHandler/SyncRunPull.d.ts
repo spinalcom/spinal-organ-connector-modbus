@@ -63,6 +63,7 @@ export declare class SyncRunPull {
     private waitFct;
     createEndpoint(deviceId: string, endpointName: string, initialValue: number | string | boolean): Promise<SpinalNode<any>>;
     updateData(): Promise<void>;
+    private readAllDevices;
     sendWriteRequest(newValue: number | bigint, dataType: string, dataAddress: number, ip: string, port: number, busAddress: number, size?: number, isUnsigned?: boolean): Promise<boolean>;
     initValueBinds(): Promise<void>;
     createDataPointsFromConfig(): Promise<void>;

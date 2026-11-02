@@ -11,64 +11,8 @@ const spinal_model_bmsnetwork_1 = require("spinal-model-bmsnetwork");
 const InputDataModel_1 = require("../../../model/InputData/InputDataModel/InputDataModel");
 const spinal_model_timeseries_1 = require("spinal-model-timeseries");
 const modbus_serial_1 = __importDefault(require("modbus-serial"));
+const ModbusConnection_1 = require("./ModbusConnection");
 const xlsx_1 = __importDefault(require("xlsx"));
-class ModbusConnectionWrapper {
-    modbusClient;
-    // This promise chain ensures operations execute one after the other.
-    queue = Promise.resolve();
-    ip;
-    port;
-    constructor(ip, port) {
-        this.ip = ip;
-        this.port = port;
-        this.modbusClient = new modbus_serial_1.default();
-    }
-    async connect() {
-        if (!this.modbusClient.isOpen) {
-            await this.modbusClient.connectTCP(this.ip, { port: this.port });
-        }
-    }
-    /**
-     * Queues an operation. Before running the operation, ensure the connection is open
-     * and set the slave ID (busAddress).
-     */
-    async execute(busAddress, operation) {
-        return (this.queue = this.queue.then(async () => {
-            await this.connect();
-            this.modbusClient.setID(busAddress);
-            const result = await operation(this.modbusClient);
-            return result;
-        }));
-    }
-    close() {
-        if (this.modbusClient.isOpen) {
-            this.modbusClient.close(() => {
-                console.log('Closing Modbus connection :' + this.ip + ':' + this.port);
-            });
-        }
-    }
-}
-class ModbusConnectionManager {
-    // We use a key of "ip:port" to store each persistent connection.
-    connections = new Map();
-    getKey(ip, port) {
-        return `${ip}:${port}`;
-    }
-    async getConnection(ip, port) {
-        const key = this.getKey(ip, port);
-        if (!this.connections.has(key)) {
-            const wrapper = new ModbusConnectionWrapper(ip, port);
-            this.connections.set(key, wrapper);
-        }
-        return this.connections.get(key);
-    }
-    closeAll() {
-        for (const wrapper of this.connections.values()) {
-            wrapper.close();
-        }
-        this.connections.clear();
-    }
-}
 /**
  * Main purpose of this class is to pull tickets from client.
  *
@@ -90,7 +34,7 @@ class SyncRunPull {
     skipFirst;
     bindInitialized = false;
     enpointPreviousValues = {};
-    connectionManager = new ModbusConnectionManager();
+    connectionManager = new ModbusConnection_1.ModbusConnectionManager();
     constructor(graph, config, nwService) {
         this.graph = graph;
         this.config = config;
@@ -528,6 +472,16 @@ class SyncRunPull {
     }*/
     async updateData() {
         this.updatingData = true;
+        try {
+            await this.readAllDevices();
+        }
+        finally {
+            this.updatingData = false;
+        }
+    }
+    async readAllDevices() {
+        let succeeded = 0;
+        let failed = 0;
         for (const device of this.modbusConfig) {
             // Get a persistent connection for this device.
             const connection = await this.connectionManager.getConnection(device.ip, device.port);
@@ -547,62 +501,76 @@ class SyncRunPull {
                     console.log('Endpoint does not exist, creating new endpoint... ', dataPoint.name);
                     endpointNode = await this.createEndpoint(deviceNode.getId().get(), dataPoint.name, 0);
                     spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(endpointNode);
-                    await this.nwService.setEndpointValue(endpointNode.info.id.get(), 0);
-                    await this.timeseriesService.pushFromEndpoint(endpointNode.info.id.get(), 0);
                     const realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(endpointNode.getId().get());
                     await spinal_env_viewer_plugin_documentation_service_1.attributeService.updateAttribute(realNode, 'default', 'timeSeries maxDay', { value: '366' });
                 }
                 spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(endpointNode);
-                // Queue the read operation
-                await connection.execute(dataPoint.bus_address, async (client) => {
-                    let result;
-                    switch (dataPoint.type) {
-                        case 'holding_register': {
-                            const registerData = await client.readHoldingRegisters(dataPoint.address, dataPoint.size || 1);
-                            result =
-                                dataPoint.size > 2
-                                    ? this.registerValuesToUintX(registerData.data, dataPoint.isUnsigned)
-                                    : dataPoint.size === 2
+                let value;
+                try {
+                    // Queue the read operation
+                    value = await connection.execute(dataPoint.bus_address, async (client) => {
+                        let result;
+                        switch (dataPoint.type) {
+                            case 'holding_register': {
+                                const registerData = await client.readHoldingRegisters(dataPoint.address, dataPoint.size || 1);
+                                result =
+                                    dataPoint.size > 2
                                         ? this.registerValuesToUintX(registerData.data, dataPoint.isUnsigned)
-                                        : dataPoint.isUnsigned
-                                            ? registerData.data[0]
-                                            : ((registerData.data[0] & 0xffff) << 16) >> 16;
-                            break;
-                        }
-                        case 'input_register': {
-                            const inputRegisterData = await client.readInputRegisters(dataPoint.address, dataPoint.size || 1);
-                            result =
-                                dataPoint.size > 2
-                                    ? this.registerValuesToUintX(inputRegisterData.data, dataPoint.isUnsigned)
-                                    : dataPoint.size === 2
+                                        : dataPoint.size === 2
+                                            ? this.registerValuesToUintX(registerData.data, dataPoint.isUnsigned)
+                                            : dataPoint.isUnsigned
+                                                ? registerData.data[0]
+                                                : ((registerData.data[0] & 0xffff) << 16) >> 16;
+                                break;
+                            }
+                            case 'input_register': {
+                                const inputRegisterData = await client.readInputRegisters(dataPoint.address, dataPoint.size || 1);
+                                result =
+                                    dataPoint.size > 2
                                         ? this.registerValuesToUintX(inputRegisterData.data, dataPoint.isUnsigned)
-                                        : dataPoint.isUnsigned
-                                            ? inputRegisterData.data[0]
-                                            : ((inputRegisterData.data[0] & 0xffff) << 16) >> 16;
-                            break;
+                                        : dataPoint.size === 2
+                                            ? this.registerValuesToUintX(inputRegisterData.data, dataPoint.isUnsigned)
+                                            : dataPoint.isUnsigned
+                                                ? inputRegisterData.data[0]
+                                                : ((inputRegisterData.data[0] & 0xffff) << 16) >> 16;
+                                break;
+                            }
+                            case 'coil': {
+                                const coilData = await client.readCoils(dataPoint.address, 1);
+                                result = coilData.data[0] ? 1 : 0;
+                                break;
+                            }
+                            case 'discrete_input': {
+                                const discreteInputData = await client.readDiscreteInputs(dataPoint.address, 1);
+                                result = discreteInputData.data[0] ? 1 : 0;
+                                break;
+                            }
+                            default:
+                                console.error('Unsupported data point type:', dataPoint.type);
+                                return undefined;
                         }
-                        case 'coil': {
-                            const coilData = await client.readCoils(dataPoint.address, 1);
-                            result = coilData.data[0] ? 1 : 0;
-                            break;
-                        }
-                        case 'discrete_input': {
-                            const discreteInputData = await client.readDiscreteInputs(dataPoint.address, 1);
-                            result = discreteInputData.data[0] ? 1 : 0;
-                            break;
-                        }
-                        default:
-                            console.error('Unsupported data point type:', dataPoint.type);
-                            return;
+                        return result;
+                    });
+                }
+                catch (error) {
+                    failed += 1;
+                    console.error(`Read failed for ${device.name} / ${dataPoint.name}:`, error?.message);
+                    // The gateway is unusable: the other points of this device would fail too.
+                    if (error instanceof ModbusConnection_1.ModbusBackoffError || (0, ModbusConnection_1.isConnectionError)(error)) {
+                        break;
                     }
-                    await this.nwService.setEndpointValue(endpointNode.info.id.get(), result);
-                    await this.timeseriesService.pushFromEndpoint(endpointNode.info.id.get(), result);
-                    this.enpointPreviousValues[endpointNode.info.id.get()] = result;
-                    console.log(`Updated endpoint ${dataPoint.name} with value:`, result, ' unsigned:', dataPoint.isUnsigned);
-                });
+                    continue;
+                }
+                if (value === undefined)
+                    continue;
+                // setEndpointValue also stores the value in the timeseries.
+                await this.nwService.setEndpointValue(endpointNode.info.id.get(), value);
+                this.enpointPreviousValues[endpointNode.info.id.get()] = value;
+                succeeded += 1;
+                console.log(`Updated endpoint ${dataPoint.name} with value:`, value, ' unsigned:', dataPoint.isUnsigned);
             }
         }
-        this.updatingData = false;
+        console.log(`Read cycle done: ${succeeded} succeeded, ${failed} failed`);
     }
     async sendWriteRequest(newValue, dataType, dataAddress, ip, port, busAddress, size = 1, isUnsigned = false) {
         try {
@@ -700,8 +668,6 @@ class SyncRunPull {
                     console.log('Endpoint do not exist, creating new endpoint... ', dataPoint.name);
                     endpointNode = await this.createEndpoint(deviceNode.getId().get(), dataPoint.name, 0);
                     spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(endpointNode);
-                    await this.nwService.setEndpointValue(endpointNode.info.id.get(), 0);
-                    await this.timeseriesService.pushFromEndpoint(endpointNode.info.id.get(), 0);
                     const realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(endpointNode.getId().get());
                     await spinal_env_viewer_plugin_documentation_service_1.attributeService.updateAttribute(realNode, 'default', 'timeSeries maxDay', { value: '366' });
                 }
