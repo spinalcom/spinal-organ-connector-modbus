@@ -20,6 +20,11 @@ import {
 } from '../../../model/InputData/InputDataModel/InputDataModel';
 import { SpinalServiceTimeseries } from 'spinal-model-timeseries';
 import ModbusRTU from 'modbus-serial';
+import {
+  ModbusBackoffError,
+  ModbusConnectionManager,
+  isConnectionError,
+} from './ModbusConnection';
 import xlsx from 'xlsx';
 import {
   spinalCore,
@@ -41,78 +46,6 @@ interface ModbusDevice {
     isUnsigned?: boolean;
     isCommand?: boolean; // if true, we write data onto the modbus server
   }[];
-}
-
-class ModbusConnectionWrapper {
-  private modbusClient: ModbusRTU;
-  // This promise chain ensures operations execute one after the other.
-  private queue: Promise<any> = Promise.resolve();
-  private ip: string;
-  private port: number;
-
-  constructor(ip: string, port: number) {
-    this.ip = ip;
-    this.port = port;
-    this.modbusClient = new ModbusRTU();
-  }
-
-  async connect(): Promise<void> {
-    if (!this.modbusClient.isOpen) {
-      await this.modbusClient.connectTCP(this.ip, { port: this.port });
-    }
-  }
-
-  /**
-   * Queues an operation. Before running the operation, ensure the connection is open
-   * and set the slave ID (busAddress).
-   */
-  async execute<T>(
-    busAddress: number,
-    operation: (client: ModbusRTU) => Promise<T>
-  ): Promise<T> {
-    return (this.queue = this.queue.then(async () => {
-      await this.connect();
-      this.modbusClient.setID(busAddress);
-      const result = await operation(this.modbusClient);
-      return result;
-    }));
-  }
-
-  close(): void {
-    if (this.modbusClient.isOpen) {
-      this.modbusClient.close(() => {
-        console.log('Closing Modbus connection :' + this.ip + ':' + this.port);
-      });
-    }
-  }
-}
-
-class ModbusConnectionManager {
-  // We use a key of "ip:port" to store each persistent connection.
-  private connections: Map<string, ModbusConnectionWrapper> = new Map();
-
-  private getKey(ip: string, port: number): string {
-    return `${ip}:${port}`;
-  }
-
-  async getConnection(
-    ip: string,
-    port: number
-  ): Promise<ModbusConnectionWrapper> {
-    const key = this.getKey(ip, port);
-    if (!this.connections.has(key)) {
-      const wrapper = new ModbusConnectionWrapper(ip, port);
-      this.connections.set(key, wrapper);
-    }
-    return this.connections.get(key);
-  }
-
-  closeAll(): void {
-    for (const wrapper of this.connections.values()) {
-      wrapper.close();
-    }
-    this.connections.clear();
-  }
 }
 
 /**
@@ -656,6 +589,16 @@ export class SyncRunPull {
 
   async updateData() {
     this.updatingData = true;
+    try {
+      await this.readAllDevices();
+    } finally {
+      this.updatingData = false;
+    }
+  }
+
+  private async readAllDevices() {
+    let succeeded = 0;
+    let failed = 0;
     for (const device of this.modbusConfig) {
       // Get a persistent connection for this device.
       const connection = await this.connectionManager.getConnection(
@@ -714,8 +657,12 @@ export class SyncRunPull {
         }
         SpinalGraphService._addNode(endpointNode);
 
-        // Queue the read operation
-        await connection.execute(dataPoint.bus_address, async (client) => {
+        let value;
+        try {
+          // Queue the read operation
+          value = await connection.execute(
+            dataPoint.bus_address,
+            async (client) => {
           let result;
           switch (dataPoint.type) {
             case 'holding_register': {
@@ -775,27 +722,44 @@ export class SyncRunPull {
             }
             default:
               console.error('Unsupported data point type:', dataPoint.type);
-              return;
+              return undefined;
           }
-          await this.nwService.setEndpointValue(
-            endpointNode.info.id.get(),
-            result
+          return result;
+            }
           );
-          await this.timeseriesService.pushFromEndpoint(
-            endpointNode.info.id.get(),
-            result
+        } catch (error) {
+          failed += 1;
+          console.error(
+            `Read failed for ${device.name} / ${dataPoint.name}:`,
+            error?.message
           );
-          this.enpointPreviousValues[endpointNode.info.id.get()] = result;
-          console.log(
-            `Updated endpoint ${dataPoint.name} with value:`,
-            result,
-            ' unsigned:',
-            dataPoint.isUnsigned
-          );
-        });
+          // The gateway is unusable: the other points of this device would fail too.
+          if (error instanceof ModbusBackoffError || isConnectionError(error)) {
+            break;
+          }
+          continue;
+        }
+        if (value === undefined) continue;
+
+        await this.nwService.setEndpointValue(
+          endpointNode.info.id.get(),
+          value
+        );
+        await this.timeseriesService.pushFromEndpoint(
+          endpointNode.info.id.get(),
+          value
+        );
+        this.enpointPreviousValues[endpointNode.info.id.get()] = value;
+        succeeded += 1;
+        console.log(
+          `Updated endpoint ${dataPoint.name} with value:`,
+          value,
+          ' unsigned:',
+          dataPoint.isUnsigned
+        );
       }
     }
-    this.updatingData = false;
+    console.log(`Read cycle done: ${succeeded} succeeded, ${failed} failed`);
   }
 
   async sendWriteRequest(
