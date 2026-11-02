@@ -133,6 +133,16 @@ Or using [pm2](https://pm2.keymetrics.io/docs/usage/quick-start/)
 pm2 start index.js --name spinal-organ-modbus
 ```
 
+### Operating notes
+
+- **`.env`:** do not keep the comments shown above on the same line as a value. dotenv keeps them in the value, so `MODBUS_STUDIO_PLUGIN_CONTROL=0   # ...` no longer equals `0` and the organ stays in StandBy without any error.
+- **`MODBUS_TIMEOUT` (optional):** timeout in ms for the TCP connection and Modbus requests. Default: `2000`.
+- **Connection failures:** the organ keeps running and retries each gateway, from 5 s up to 5 min between attempts. Each cycle logs `Read cycle done: N succeeded, M failed`.
+- **Install:** use `spinalcom-utils i`, as plain `npm install` ignores `spinalDependencies`. Do not restore a `package-lock.json` in `lockfileVersion: 1` with git references: it makes the install spawn processes in cascade.
+- **Tests:** `npm test` runs on local sockets, with no hub and no digital twin.
+
+Changes are listed with their reason and fix in [CHANGELOG.md](CHANGELOG.md).
+
 ### Plugin Interface
 
 After starting the connector the first time, it will create : 
