@@ -39,10 +39,13 @@
   "license": "Free_Software_License_Agreement.pdf",
   "spinalDependencies": {
     "spinal-core-connectorjs_type": "spinal-core-connectorjs_type",
+    "spinal-env-viewer-context-geographic-service": "spinal-env-viewer-context-geographic-service",
     "spinal-env-viewer-graph-service": "Spinal-Graph-Service",
     "spinal-env-viewer-plugin-documentation-service": "spinal-env-viewer-plugin-documentation-service",
     "spinal-env-viewer-plugin-group-manager-service": "spinal-env-viewer-plugin-group-manager-service",
     "spinal-lib-organ-monitoring": "spinal-lib-organ-monitoring",
+    "spinal-model-bmsnetwork": "spinal-model-bmsnetwork",
+    "spinal-model-timeseries": "spinal-model-timeseries",
     "spinal-service-ticket": "spinal-service-ticket"
   }
 }
