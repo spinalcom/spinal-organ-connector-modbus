@@ -21,12 +21,6 @@
     "modbus-serial": "^8.0.16",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.33",
-    "spinal-core-connectorjs_type": "git+https://github.com/spinalcom/spinal-core-connectorjs_type.git",
-    "spinal-env-viewer-graph-service": "git+https://github.com/spinalcom/Spinal-Graph-Service.git",
-    "spinal-env-viewer-plugin-documentation-service": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-documentation-service.git",
-    "spinal-env-viewer-plugin-group-manager-service": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-group-manager-service.git",
-    "spinal-lib-organ-monitoring": "git+https://github.com/spinalcom/spinal-lib-organ-monitoring.git",
-    "spinal-service-ticket": "git+https://github.com/spinalcom/spinal-service-ticket.git",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -42,5 +36,13 @@
   },
   "keywords": [],
   "author": "",
-  "license": "Free_Software_License_Agreement.pdf"
+  "license": "Free_Software_License_Agreement.pdf",
+  "spinalDependencies": {
+    "spinal-core-connectorjs_type": "spinal-core-connectorjs_type",
+    "spinal-env-viewer-graph-service": "Spinal-Graph-Service",
+    "spinal-env-viewer-plugin-documentation-service": "spinal-env-viewer-plugin-documentation-service",
+    "spinal-env-viewer-plugin-group-manager-service": "spinal-env-viewer-plugin-group-manager-service",
+    "spinal-lib-organ-monitoring": "spinal-lib-organ-monitoring",
+    "spinal-service-ticket": "spinal-service-ticket"
+  }
 }
