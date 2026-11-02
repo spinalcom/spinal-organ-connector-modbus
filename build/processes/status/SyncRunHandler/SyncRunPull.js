@@ -12,6 +12,7 @@ const InputDataModel_1 = require("../../../model/InputData/InputDataModel/InputD
 const spinal_model_timeseries_1 = require("spinal-model-timeseries");
 const modbus_serial_1 = __importDefault(require("modbus-serial"));
 const ModbusConnection_1 = require("./ModbusConnection");
+const DeviceStatus_1 = require("./DeviceStatus");
 const xlsx_1 = __importDefault(require("xlsx"));
 /**
  * Main purpose of this class is to pull tickets from client.
@@ -35,6 +36,7 @@ class SyncRunPull {
     bindInitialized = false;
     enpointPreviousValues = {};
     connectionManager = new ModbusConnection_1.ModbusConnectionManager();
+    deviceStatus = new DeviceStatus_1.DeviceStatusTracker();
     constructor(graph, config, nwService) {
         this.graph = graph;
         this.config = config;
@@ -509,6 +511,7 @@ class SyncRunPull {
             // @ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(deviceNode);
             const endpointNodes = await deviceNode.getChildren('hasBmsEndpoint');
+            const cycle = { succeeded: 0, failed: 0 };
             for (const dataPoint of device.dataPoints) {
                 let endpointNode = endpointNodes.find((node) => node.info.name.get() === dataPoint.name);
                 if (!endpointNode) {
@@ -567,6 +570,9 @@ class SyncRunPull {
                 }
                 catch (error) {
                     failed += 1;
+                    cycle.failed += 1;
+                    cycle.lastError = `${dataPoint.name}: ${error?.message}`;
+                    cycle.skippedByBackoff = error instanceof ModbusConnection_1.ModbusBackoffError;
                     console.error(`Read failed for ${device.name} / ${dataPoint.name}:`, error?.message);
                     // The gateway is unusable: the other points of this device would fail too.
                     if (error instanceof ModbusConnection_1.ModbusBackoffError || (0, ModbusConnection_1.isConnectionError)(error)) {
@@ -580,10 +586,32 @@ class SyncRunPull {
                 await this.nwService.setEndpointValue(endpointNode.info.id.get(), value);
                 this.enpointPreviousValues[endpointNode.info.id.get()] = value;
                 succeeded += 1;
+                cycle.succeeded += 1;
                 console.log(`Updated endpoint ${dataPoint.name} with value:`, value, ' unsigned:', dataPoint.isUnsigned);
             }
+            await this.publishDeviceStatus(device.name, deviceNode, cycle);
         }
         console.log(`Read cycle done: ${succeeded} succeeded, ${failed} failed`);
+    }
+    /**
+     * Writes the status attributes of a device, only for the values that changed.
+     * A failure here must not interrupt the reads.
+     */
+    async publishDeviceStatus(deviceName, deviceNode, cycle) {
+        const changes = Object.entries(this.deviceStatus.update(deviceName, cycle));
+        if (changes.length === 0)
+            return;
+        try {
+            const category = (await spinal_env_viewer_plugin_documentation_service_1.attributeService.getCategoryByName(deviceNode, DeviceStatus_1.STATUS_CATEGORY)) ||
+                (await spinal_env_viewer_plugin_documentation_service_1.attributeService.addCategoryAttribute(deviceNode, DeviceStatus_1.STATUS_CATEGORY));
+            for (const [label, value] of changes) {
+                await spinal_env_viewer_plugin_documentation_service_1.attributeService.updateAttribute(deviceNode, category, label, { value }, true);
+            }
+            console.log(`Device status written: ${deviceName}, ${changes.length} attribute(s)`);
+        }
+        catch (error) {
+            console.error(`Failed to write status of ${deviceName}:`, error?.message);
+        }
     }
     async sendWriteRequest(newValue, dataType, dataAddress, ip, port, busAddress, size = 1, isUnsigned = false) {
         try {

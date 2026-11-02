@@ -41,6 +41,7 @@ export declare class SyncRunPull {
         [key: string]: boolean | number;
     };
     private connectionManager;
+    private deviceStatus;
     constructor(graph: SpinalGraph<any>, config: OrganConfigModel, nwService: NetworkService);
     getHost(): {
         http: any;
@@ -69,6 +70,11 @@ export declare class SyncRunPull {
     createEndpoint(deviceId: string, endpointName: string, initialValue: number | string | boolean): Promise<SpinalNode<any>>;
     updateData(): Promise<void>;
     private readAllDevices;
+    /**
+     * Writes the status attributes of a device, only for the values that changed.
+     * A failure here must not interrupt the reads.
+     */
+    private publishDeviceStatus;
     sendWriteRequest(newValue: number | bigint, dataType: string, dataAddress: number, ip: string, port: number, busAddress: number, size?: number, isUnsigned?: boolean): Promise<boolean>;
     initValueBinds(): Promise<void>;
     createDataPointsFromConfig(): Promise<void>;
