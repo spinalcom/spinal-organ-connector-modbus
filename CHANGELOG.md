@@ -25,7 +25,7 @@ Each entry gives the reason for the change, the fix, and how it was verified.
   - `readAllDevices()` catches errors per point. A connection failure skips the rest of that device, and a Modbus exception or a silent meter only skips that point, since the gateway itself is still fine.
   - `updateData()` resets `updatingData` in a `finally`.
   - Each cycle logs `Read cycle done: N succeeded, M failed`.
-- **Verified:** `npm test` (connection refused then recovered, gateway dropped then recovered, refused register).
+- **Verified:** `npm test` (connection refused then recovered, gateway dropped then recovered, refused register), then end-to-end on a test hub: simulator stopped for 25 s, reads resumed without restart, and a dead gateway did not stop the other device.
 
 ### Fixed: no timeout on Modbus calls (A2)
 
@@ -41,13 +41,19 @@ Each entry gives the reason for the change, the fix, and how it was verified.
 
 - **Reason:** creating an endpoint stored a 0 in its timeseries, in both `updateData` and `createDataPointsFromConfig`. On an energy index, the jump from 0 to the real value looks like a huge consumption and distorts daily and monthly differences.
 - **Fix:** both creation paths no longer write a value. `setEndpointValue(..., 0)` was removed as well, because it also stores in the timeseries when `NetworkService(true)` is used. The first real read now creates the first point.
-- **Verified:** code reading only. **The test on a hub is still to be done.** Endpoints already created by an earlier version keep their 0 until it is purged.
+- **Verified:** end-to-end run on a test hub with a local simulator: no 0 in any timeseries, including endpoints that were never read. Endpoints already created by an earlier version keep their 0 until it is purged.
 
 ### Fixed: each measure stored twice (A4)
 
 - **Reason:** `setEndpointValue` already pushes to the timeseries (`spinal-model-bmsnetwork` 1.4.1, `NetworkService(true)`), and `pushFromEndpoint` pushed the same value again.
 - **Fix:** second push removed. The hub write now also happens outside the Modbus queue, so a slow hub cannot trigger the Modbus deadline.
-- **Verified:** code reading only. **The test on a hub is still to be done.**
+- **Verified:** same run: 8 reads gave exactly 8 timeseries points on each endpoint.
+
+### Fixed: creating an endpoint failed with "no attribute found"
+
+- **Reason:** `updateAttribute` throws when the attribute does not exist, which is always the case on a new endpoint. Startup stopped before the value binds and `Init Done`, each read cycle created one endpoint and then waited 60 s, and the 366-day retention was never applied.
+- **Fix:** `setTimeSeriesRetention()` creates the `default` category and the attribute when they are missing. A failure there is logged and no longer stops the organ.
+- **Verified:** end-to-end run on a test hub. Endpoints created by an earlier version keep the default retention.
 
 ### Added
 
