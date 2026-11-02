@@ -55,9 +55,20 @@ Each entry gives the reason for the change, the fix, and how it was verified.
 - **Fix:** `setTimeSeriesRetention()` creates the `default` category and the attribute when they are missing. A failure there is logged and no longer stops the organ.
 - **Verified:** end-to-end run on a test hub. Endpoints created by an earlier version keep the default retention.
 
+### Added: read status per device (A7)
+
+- **Reason:** after a failed read, the old value stayed in place with no indication, so a flat curve could not be told apart from a silent meter. The status only existed in the logs.
+- **Fix:** each device gets a `modbus` attribute category, visible on the node:
+  - `modbus status`: `ok`, `partial` or `error`;
+  - `modbus last error`: the failing point and its error;
+  - `modbus failing since`: UTC date of the start of the failure;
+  - `modbus last success`: UTC date, refreshed as described below.
+- **Hub load:** `DeviceStatusTracker` writes an attribute only when its value changes, and refreshes `modbus last success` at most every 15 minutes per device. A failure lasting several cycles writes once. Backoff messages hold a countdown, so they are not written. A failed status write is logged and never interrupts the reads.
+- **Verified:** `npm test`, then end-to-end on a test hub with a simulator outage: 11 read cycles gave 4 status writes (11 attributes) and no timeseries point. On a restart the status is written once again, as it is only tracked in memory.
+
 ### Added
 
-- `npm test`: tests in `test/modbusConnection.test.js`, on loopback sockets, with no hub and no extra dependency.
+- `npm test`: tests in `test/modbusConnection.test.js` and `test/deviceStatus.test.js`, with no hub and no extra dependency.
 - `src/processes/status/SyncRunHandler/ModbusConnection.ts`: connection classes moved out of `SyncRunPull.ts` so they can be tested without loading the graph.
 
 ### Not changed
