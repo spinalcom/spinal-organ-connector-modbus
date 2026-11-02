@@ -639,11 +639,6 @@ export class SyncRunPull {
             0
           );
           SpinalGraphService._addNode(endpointNode);
-          await this.nwService.setEndpointValue(endpointNode.info.id.get(), 0);
-          await this.timeseriesService.pushFromEndpoint(
-            endpointNode.info.id.get(),
-            0
-          );
 
           const realNode = SpinalGraphService.getRealNode(
             endpointNode.getId().get()
@@ -741,11 +736,8 @@ export class SyncRunPull {
         }
         if (value === undefined) continue;
 
+        // setEndpointValue also stores the value in the timeseries.
         await this.nwService.setEndpointValue(
-          endpointNode.info.id.get(),
-          value
-        );
-        await this.timeseriesService.pushFromEndpoint(
           endpointNode.info.id.get(),
           value
         );
@@ -917,11 +909,6 @@ export class SyncRunPull {
             0
           );
           SpinalGraphService._addNode(endpointNode);
-          await this.nwService.setEndpointValue(endpointNode.info.id.get(), 0);
-          await this.timeseriesService.pushFromEndpoint(
-            endpointNode.info.id.get(),
-            0
-          );
 
           const realNode = SpinalGraphService.getRealNode(
             endpointNode.getId().get()
