@@ -333,6 +333,30 @@ export class SyncRunPull {
     });
   }
 
+  /**
+   * Keeps 366 days of timeseries on a new endpoint. A failure here must not
+   * stop the organ: the endpoint still works with the default retention.
+   */
+  private async setTimeSeriesRetention(node: SpinalNode<any>): Promise<void> {
+    try {
+      const category =
+        (await attributeService.getCategoryByName(node, 'default')) ||
+        (await attributeService.addCategoryAttribute(node, 'default'));
+      await attributeService.updateAttribute(
+        node,
+        category,
+        'timeSeries maxDay',
+        { value: '366' },
+        true
+      );
+    } catch (error) {
+      console.error(
+        `Failed to set timeseries retention on ${node.info.name.get()}:`,
+        error?.message
+      );
+    }
+  }
+
   async createEndpoint(
     deviceId: string,
     endpointName: string,
@@ -640,14 +664,8 @@ export class SyncRunPull {
           );
           SpinalGraphService._addNode(endpointNode);
 
-          const realNode = SpinalGraphService.getRealNode(
-            endpointNode.getId().get()
-          );
-          await attributeService.updateAttribute(
-            realNode,
-            'default',
-            'timeSeries maxDay',
-            { value: '366' }
+          await this.setTimeSeriesRetention(
+            SpinalGraphService.getRealNode(endpointNode.getId().get())
           );
         }
         SpinalGraphService._addNode(endpointNode);
@@ -910,14 +928,8 @@ export class SyncRunPull {
           );
           SpinalGraphService._addNode(endpointNode);
 
-          const realNode = SpinalGraphService.getRealNode(
-            endpointNode.getId().get()
-          );
-          await attributeService.updateAttribute(
-            realNode,
-            'default',
-            'timeSeries maxDay',
-            { value: '366' }
+          await this.setTimeSeriesRetention(
+            SpinalGraphService.getRealNode(endpointNode.getId().get())
           );
         }
         SpinalGraphService._addNode(endpointNode);
