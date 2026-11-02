@@ -25,6 +25,11 @@ import {
   ModbusConnectionManager,
   isConnectionError,
 } from './ModbusConnection';
+import {
+  DeviceCycleResult,
+  DeviceStatusTracker,
+  STATUS_CATEGORY,
+} from './DeviceStatus';
 import xlsx from 'xlsx';
 import {
   spinalCore,
@@ -72,6 +77,7 @@ export class SyncRunPull {
   enpointPreviousValues: { [key: string]: boolean | number } = {};
   private connectionManager: ModbusConnectionManager =
     new ModbusConnectionManager();
+  private deviceStatus: DeviceStatusTracker = new DeviceStatusTracker();
 
   
   constructor(
@@ -647,6 +653,7 @@ export class SyncRunPull {
       SpinalGraphService._addNode(deviceNode);
 
       const endpointNodes = await deviceNode.getChildren('hasBmsEndpoint');
+      const cycle: DeviceCycleResult = { succeeded: 0, failed: 0 };
 
       for (const dataPoint of device.dataPoints) {
         let endpointNode = endpointNodes.find(
@@ -742,6 +749,9 @@ export class SyncRunPull {
           );
         } catch (error) {
           failed += 1;
+          cycle.failed += 1;
+          cycle.lastError = `${dataPoint.name}: ${error?.message}`;
+          cycle.skippedByBackoff = error instanceof ModbusBackoffError;
           console.error(
             `Read failed for ${device.name} / ${dataPoint.name}:`,
             error?.message
@@ -761,6 +771,7 @@ export class SyncRunPull {
         );
         this.enpointPreviousValues[endpointNode.info.id.get()] = value;
         succeeded += 1;
+        cycle.succeeded += 1;
         console.log(
           `Updated endpoint ${dataPoint.name} with value:`,
           value,
@@ -768,8 +779,45 @@ export class SyncRunPull {
           dataPoint.isUnsigned
         );
       }
+      await this.publishDeviceStatus(device.name, deviceNode, cycle);
     }
     console.log(`Read cycle done: ${succeeded} succeeded, ${failed} failed`);
+  }
+
+  /**
+   * Writes the status attributes of a device, only for the values that changed.
+   * A failure here must not interrupt the reads.
+   */
+  private async publishDeviceStatus(
+    deviceName: string,
+    deviceNode: SpinalNode<any>,
+    cycle: DeviceCycleResult
+  ): Promise<void> {
+    const changes = Object.entries(this.deviceStatus.update(deviceName, cycle));
+    if (changes.length === 0) return;
+    try {
+      const category =
+        (await attributeService.getCategoryByName(
+          deviceNode,
+          STATUS_CATEGORY
+        )) ||
+        (await attributeService.addCategoryAttribute(
+          deviceNode,
+          STATUS_CATEGORY
+        ));
+      for (const [label, value] of changes) {
+        await attributeService.updateAttribute(
+          deviceNode,
+          category,
+          label,
+          { value },
+          true
+        );
+      }
+      console.log(`Device status written: ${deviceName}, ${changes.length} attribute(s)`);
+    } catch (error) {
+      console.error(`Failed to write status of ${deviceName}:`, error?.message);
+    }
   }
 
   async sendWriteRequest(

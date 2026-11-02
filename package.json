@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "types": "build/index.ts.d",
   "scripts": {
-    "test": "tsc && node --test test/modbusConnection.test.js",
+    "test": "tsc && node --test test/modbusConnection.test.js test/deviceStatus.test.js",
     "dev": "tsc -w & nodemon index.js",
     "debug": "ts-node ./src/index.js",
     "build": "tsc",

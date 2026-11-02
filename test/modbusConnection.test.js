@@ -87,7 +87,11 @@ test('A1: queued operations each get their own result', async () => {
 
 test('A2: a silent device rejects instead of hanging', async () => {
   const port = await freePort();
-  const silent = net.createServer(() => undefined);
+  // Reads requests without answering, and closes when the client closes.
+  const silent = net.createServer((socket) => {
+    socket.on('error', () => undefined);
+    socket.resume();
+  });
   await new Promise((resolve) => silent.listen(port, '127.0.0.1', resolve));
   const connection = new ModbusConnectionWrapper('127.0.0.1', port, OPTIONS);
 
